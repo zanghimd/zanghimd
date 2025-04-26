@@ -1,0 +1,38 @@
+# .github/workflows/deploy-preview.yml
+
+name: Preview Docusaurus PR on GitHub Pages
+
+on:
+  pull_request:
+    branches:
+      - main  # PRs targeting "main" branch
+
+permissions:
+  contents: write  # Needed for deploying
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Docusaurus site
+        run: npm run build
+
+      - name: Deploy PR Preview to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          publish_branch: gh-pages-preview  # <-- Use a different branch for PR previews
+          force_orphan: true  # Clean history for each preview
